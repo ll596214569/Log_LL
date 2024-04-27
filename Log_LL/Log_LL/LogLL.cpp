@@ -73,6 +73,7 @@ bool LogLL::AddDailyFile(const char* pLoggerName, const char* pFileName, const i
 
 bool LogLL::InitConfig_ini(const char* pFileName)
 {
+    /*
     try
     {
     #ifdef _WIN32
@@ -80,7 +81,7 @@ bool LogLL::InitConfig_ini(const char* pFileName)
         _snprintf_s(wsz, 256, 255, "%s", pFileName);
         LPCSTR path = wsz;
 
-        int nLoggerNum = GetPrivateProfileInt("CONFIG", "LoggerNum", 0, path);
+        int nLoggerNum = GetPrivateProfileInt(L"CONFIG", L"LoggerNum", 0, path);
         char szTemp[256] = { 0 };
 
         for(size_t i = 0; i < nLoggerNum; ++i)
@@ -174,7 +175,7 @@ bool LogLL::InitConfig_ini(const char* pFileName)
     {
         cout << "[system-log-init-error]: AddConfig failed!, exception" << endl;
         return false;
-    }
+    }*/
     return true;
 }
 
