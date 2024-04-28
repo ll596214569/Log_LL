@@ -3,7 +3,7 @@
 #ifndef _LOG_LL_H
 #define _LOG_LL_H
 
-#include "./spdlog/include/spdlog/spdlog.h"
+#include "spdlog/spdlog.h"
 
 #include <map>
 #include <string>
@@ -173,6 +173,13 @@ private:
     //<logger名称，logger异步需要的线程池>：由于记录器获取线程池的weak_ptr，所以线程池对象必须比记录器对象的寿命长
     std::map<std::string, std::shared_ptr<spdlog::details::thread_pool>> m_mapAsyncThreadPool;
 };
+
+#define LOG_LL_TRACE(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::trace, __VA_ARGS__)
+#define LOG_LL_DEBUG(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::debug, __VA_ARGS__)
+#define LOG_LL_INFO(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::info, __VA_ARGS__)
+#define LOG_LL_WARN(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::warn, __VA_ARGS__)
+#define LOG_LL_ERROR(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::err, __VA_ARGS__)
+#define LOG_LL_CRITI(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::critical, __VA_ARGS__)
 
 };
 

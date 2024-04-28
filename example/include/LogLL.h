@@ -174,6 +174,13 @@ private:
     std::map<std::string, std::shared_ptr<spdlog::details::thread_pool>> m_mapAsyncThreadPool;
 };
 
+#define LOG_LL_TRACE(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::trace, __VA_ARGS__)
+#define LOG_LL_DEBUG(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::debug, __VA_ARGS__)
+#define LOG_LL_INFO(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::info, __VA_ARGS__)
+#define LOG_LL_WARN(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::warn, __VA_ARGS__)
+#define LOG_LL_ERROR(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::err, __VA_ARGS__)
+#define LOG_LL_CRITI(loggerName, ...) SPDLOG_LOGGER_CALL(spdlog::get(loggerName), spdlog::level::critical, __VA_ARGS__)
+
 };
 
 #endif

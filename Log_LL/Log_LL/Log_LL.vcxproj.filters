@@ -24,12 +24,21 @@
     <ClInclude Include="LogLL.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\SimpleIni\Simpleini.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SimpleIni\ConvertUTF.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="LogLL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="include\SimpleIni\ConvertUTF.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

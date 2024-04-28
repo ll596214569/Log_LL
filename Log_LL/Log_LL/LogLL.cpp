@@ -8,12 +8,17 @@ using namespace LOG_LL;
 #include "./spdlog/include/spdlog/sinks/daily_file_sink.h"
 #include "./spdlog/include/spdlog/details/thread_pool.h"
 
+#include "./include/SimpleIni/Simpleini.h"
+
 #include <iostream>
 #include <thread>
 #ifdef _WIN32
 #include <Windows.h>
 #endif
 using namespace std;
+
+static const std::string _STR_INT_MIN = "-2147483647"; // INT_MIN + 1
+static const std::string _STR_EMPTY = "";
 
 LogLL::LogLL()
 {
@@ -73,109 +78,98 @@ bool LogLL::AddDailyFile(const char* pLoggerName, const char* pFileName, const i
 
 bool LogLL::InitConfig_ini(const char* pFileName)
 {
-    /*
     try
     {
-    #ifdef _WIN32
-        char wsz[256] = {0};
-        _snprintf_s(wsz, 256, 255, "%s", pFileName);
-        LPCSTR path = wsz;
-
-        int nLoggerNum = GetPrivateProfileInt(L"CONFIG", L"LoggerNum", 0, path);
-        char szTemp[256] = { 0 };
-
-        for(size_t i = 0; i < nLoggerNum; ++i)
+        CSimpleIniA ini;
+        SI_Error rc = ini.LoadFile(pFileName);
+        if (rc < 0) 
         {
-            char wTemp[16] = {0};
-            _snprintf_s(wTemp, 16, 15, "Logger_%d", i);
-            LPCSTR wLog = wTemp;
-            int nSinks = GetPrivateProfileInt(wLog, "sinksNum", 0, path);
-            GetPrivateProfileString(wLog, "name", "", szTemp, 256, path);
-            string logName = szTemp;
-            memset(szTemp, 0, 255);
+            cout << "[system-log-init-iniConfig-error]: open ini config file failed!, err file :" << pFileName << endl;;
+            return false;
+        }
+        ini.SetMultiKey(false);
 
-            for(size_t j = 0; j < nSinks; ++j)
+        auto GetIniInt = [&](const string& config, const string& key) -> int {
+            return std::stoi(ini.GetValue(config.c_str(), key.c_str(), _STR_INT_MIN.c_str()));
+        };
+
+        auto GetIniString = [&](const string& config, const string& key) -> std::string {
+            return ini.GetValue(config.c_str(), key.c_str(), _STR_EMPTY.c_str());
+        };
+
+        int nLoggerNum = GetIniInt("CONFIG", "LoggerNum");
+        for (auto i = 0; i < nLoggerNum; ++i)
+        {
+            char szTemp[16] = { 0 };
+            _snprintf_s(szTemp, 16, 15, "Logger_%d", i);
+            std::string strLogger(szTemp);
+            int nSinks = GetIniInt(strLogger, "sinksNum");
+            std::string name = GetIniString(strLogger, "outputMode");
+
+            for (auto j = 0; j < nSinks; ++j)
             {
-                memset(wTemp, 0, 16);
-                _snprintf_s(wTemp, 16, 15, "sinks_%d_type", j);
-                LPCSTR wSinkType = wTemp;
-                GetPrivateProfileString(wLog, wSinkType, "", szTemp, 256, path);
-                string strSinkType = szTemp;
-                memset(szTemp, 0, 255);
+                ::memset(szTemp, 0, 16);
+                _snprintf_s(szTemp, 16, 15, "sinks_%d_type", j);
+                std::string strSinkType = szTemp;
 
-                memset(wTemp, 0, 16);
-                _snprintf_s(wTemp, 16, 15, "sinks_%d_level", j);
-                LPCSTR wSinkLevel = wTemp;
-                GetPrivateProfileString(wLog, wSinkLevel, "", szTemp, 256, path);
-                auto SinkLevel = StringToOutLevelEnum(szTemp);
-                memset(szTemp, 0, 255);
+                ::memset(szTemp, 0, 16);
+                _snprintf_s(szTemp, 16, 15, "sinks_%d_level", j);
+                auto SinkLevel = StringToOutLevelEnum(std::string(szTemp));
 
-                memset(wTemp, 0, 16);
-                _snprintf_s(wTemp, 16, 15, "sinks_%d_fileName", j);
-                LPCSTR wSinkName = wTemp;
+                ::memset(szTemp, 0, 16);
+                _snprintf_s(szTemp, 16, 15, "sinks_%d_fileName", j);
+                auto SinkNameKey = std::string(szTemp);
 
-                if (strSinkType == "console") 
+                if (strSinkType == "console")
                 {
-                    AddColorConsole(logName.c_str(), SinkLevel);
+                    AddColorConsole(name.c_str(), SinkLevel);
                 }
-                else if (strSinkType == "r_file") 
+                else if (strSinkType == "r_file")
                 {
-                    GetPrivateProfileString(wLog, wSinkName, "", szTemp, 256, path);
+                    std::string strSinkName = GetIniString(strLogger, SinkNameKey.c_str());
+
+                    ::memset(szTemp, 0, 16);
+                    _snprintf_s(szTemp, 16, 15, "sinks_%d_maxFileSize", j);
+                    int nMaxFileSize = GetIniInt(strLogger, szTemp);
+
+                    ::memset(szTemp, 0, 16);
+                    _snprintf_s(szTemp, 16, 15, "sinks_%d_maxSize", j);
+                    int nMaxFile = GetIniInt(strLogger, szTemp);
+
+                    AddRotatingFile(strLogger.c_str(), strSinkName.c_str(), nMaxFileSize, nMaxFile, SinkLevel);
+                }
+                else if (strSinkType == "d_file")
+                {
+                    std::string strSinkName = GetIniString(strLogger, SinkNameKey.c_str());
                     string strFileName = szTemp;
 
-                    memset(wTemp, 0, 16);
-                    _snprintf_s(wTemp, 16, 15, "sinks_%d_maxFileSize", j);
-					int nMaxFileSize = GetPrivateProfileInt(wLog, wTemp, 0, path);
+                    ::memset(szTemp, 0, 16);
+                    _snprintf_s(szTemp, 16, 15, "sinks_%d_hour", j);
+                    int nHour = GetIniInt(strLogger, szTemp);
 
-                    memset(wTemp, 0, 16);
-                    _snprintf_s(wTemp, 16, 15, "sinks_%d_maxSize", j);
-					int nMaxFile = GetPrivateProfileInt(wLog, wTemp, 0, path);
+                    ::memset(szTemp, 0, 16);
+                    _snprintf_s(szTemp, 16, 15, "sinks_%d_minute", j);
+                    int nMinute = GetIniInt(strLogger, szTemp);
 
-					AddRotatingFile(logName.c_str(), strFileName.c_str(), nMaxFileSize, nMaxFile, SinkLevel);
-                }
-                else if (strSinkType == "d_file") 
-                {
-                    GetPrivateProfileString(wLog, wSinkName, "", szTemp, 256, path);
-                    string strFileName = szTemp;
-
-                    memset(wTemp, 0, 16);
-                    _snprintf_s(wTemp, 16, 15, "sinks_%d_hour", j);
-					int nHour = GetPrivateProfileInt(wLog, wTemp, 0, path);
-
-                    memset(wTemp, 0, 16);
-                    _snprintf_s(wTemp, 16, 15, "sinks_%d_minute", j);
-					int nMinute = GetPrivateProfileInt(wLog, wTemp, 0, path);
-
-					AddDailyFile(logName.c_str(), strFileName.c_str(), nHour, nMinute, SinkLevel);
+                    AddDailyFile(strLogger.c_str(), strFileName.c_str(), nHour, nMinute, SinkLevel);
                 }
             }
-
         }
 
-        GetPrivateProfileString("CONFIG", "outputMode", "", szTemp, 256, path);
-        string OutputMode = szTemp;
-        memset(szTemp, 0, 255);
-
-        GetPrivateProfileString("CONFIG", "outputFormat", "", szTemp, 256, path);
-        string OutputFormat = szTemp;
-
-        return Init(StringToOutModeEnum(OutputMode), OutputFormat);
-
-    #else
-        cout << " [system-init-config-error] init config Linux not support ! " << endl;
-        return false;
-    #endif
+        std::string OutputMode = GetIniString("CONFIG", "outputMode");
+        std::string OutputFormat = GetIniString("CONFIG", "outputFormat");
+        return this->Init(StringToOutModeEnum(OutputMode), OutputFormat);
     }
     catch (std::exception& e)
     {
-        cout << "[system-log-init-error]: AddConfig failed!, err:" << e.what() << endl;;
+        cout << "[system-log-init-error]: AddConfig failed!, err:" << e.what() << endl;
         return false;
     }
     catch (...)
     {
         cout << "[system-log-init-error]: AddConfig failed!, exception" << endl;
         return false;
-    }*/
+    }
     return true;
 }
 
