@@ -1,0 +1,24 @@
+[ 2024-04-28 18:38:06.090 ] <thread 23152> [logger-Daily] [trace]
+G:\code_test\Log_LL\example\LLLogExample.cpp:40,DailyFileLogTest
+TRACE log data:这是TRACE
+
+[ 2024-04-28 18:38:06.090 ] <thread 23152> [logger-Daily] [debug]
+G:\code_test\Log_LL\example\LLLogExample.cpp:41,DailyFileLogTest
+DEBUG log data:这是DEBUG
+
+[ 2024-04-28 18:38:06.090 ] <thread 23152> [logger-Daily] [info]
+G:\code_test\Log_LL\example\LLLogExample.cpp:42,DailyFileLogTest
+INFO log data:这是INFO
+
+[ 2024-04-28 18:38:06.090 ] <thread 23152> [logger-Daily] [warning]
+G:\code_test\Log_LL\example\LLLogExample.cpp:43,DailyFileLogTest
+WARN log data:这是WARN
+
+[ 2024-04-28 18:38:06.090 ] <thread 23152> [logger-Daily] [error]
+G:\code_test\Log_LL\example\LLLogExample.cpp:44,DailyFileLogTest
+ERROR log data:这是ERROR
+
+[ 2024-04-28 18:38:06.091 ] <thread 23152> [logger-Daily] [critical]
+G:\code_test\Log_LL\example\LLLogExample.cpp:45,DailyFileLogTest
+CRITI log data:这是CRITI
+

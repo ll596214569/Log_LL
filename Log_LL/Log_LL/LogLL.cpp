@@ -183,7 +183,7 @@ bool LogLL::Init(const OutMode outMode, const string strLogFormat)
 
     if (outMode == OutMode::ASYNC)//异步
     {
-        cout << "[system-log-init-error]: mode=ASYNC" << endl;
+        cout << "[system-log-init-mode]: mode=ASYNC" << endl;
         for (auto e : m_mapLoggerParam)
         {
             std::string strLogName = e.first;
@@ -200,7 +200,7 @@ bool LogLL::Init(const OutMode outMode, const string strLogFormat)
     }
     else//同步
     {
-        cout << "[system-log-init-error]: mode=SYNC" << endl;
+        cout << "[system-log-init-mode]: mode=SYNC" << endl;
         for (auto e : m_mapLoggerParam)
         {
             std::string strLogName = e.first;

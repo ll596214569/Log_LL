@@ -1,0 +1,24 @@
+[ 2024-04-28 18:38:06.087 ] <thread 23152> [logger-Rotating] [trace]
+G:\code_test\Log_LL\example\LLLogExample.cpp:26,RotatingFileLogTest
+TRACE log data:这是TRACE
+
+[ 2024-04-28 18:38:06.087 ] <thread 23152> [logger-Rotating] [debug]
+G:\code_test\Log_LL\example\LLLogExample.cpp:27,RotatingFileLogTest
+DEBUG log data:这是DEBUG
+
+[ 2024-04-28 18:38:06.087 ] <thread 23152> [logger-Rotating] [info]
+G:\code_test\Log_LL\example\LLLogExample.cpp:28,RotatingFileLogTest
+INFO log data:这是INFO
+
+[ 2024-04-28 18:38:06.087 ] <thread 23152> [logger-Rotating] [warning]
+G:\code_test\Log_LL\example\LLLogExample.cpp:29,RotatingFileLogTest
+WARN log data:这是WARN
+
+[ 2024-04-28 18:38:06.087 ] <thread 23152> [logger-Rotating] [error]
+G:\code_test\Log_LL\example\LLLogExample.cpp:30,RotatingFileLogTest
+ERROR log data:这是ERROR
+
+[ 2024-04-28 18:38:06.088 ] <thread 23152> [logger-Rotating] [critical]
+G:\code_test\Log_LL\example\LLLogExample.cpp:31,RotatingFileLogTest
+CRITI log data:这是CRITI
+
