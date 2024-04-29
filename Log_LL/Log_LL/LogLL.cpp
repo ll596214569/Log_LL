@@ -17,9 +17,6 @@ using namespace LOG_LL;
 #endif
 using namespace std;
 
-static const std::string _STR_INT_MIN = "-2147483647"; // INT_MIN + 1
-static const std::string _STR_EMPTY = "";
-
 LogLL::LogLL()
 {
 }
@@ -90,68 +87,69 @@ bool LogLL::InitConfig_ini(const char* pFileName)
         ini.SetMultiKey(false);
 
         auto GetIniInt = [&](const string& config, const string& key) -> int {
-            return std::stoi(ini.GetValue(config.c_str(), key.c_str(), _STR_INT_MIN.c_str()));
+            return ini.GetLongValue(config.c_str(), key.c_str(), INT_MAX);
         };
 
         auto GetIniString = [&](const string& config, const string& key) -> std::string {
-            return ini.GetValue(config.c_str(), key.c_str(), _STR_EMPTY.c_str());
+            return ini.GetValue(config.c_str(), key.c_str(), "");
         };
 
         int nLoggerNum = GetIniInt("CONFIG", "LoggerNum");
         for (auto i = 0; i < nLoggerNum; ++i)
         {
-            char szTemp[16] = { 0 };
-            _snprintf_s(szTemp, 16, 15, "Logger_%d", i);
+            char szTemp[32] = { 0 };
+            _snprintf_s(szTemp, 32, 31, "Logger_%d", i);
             std::string strLogger(szTemp);
             int nSinks = GetIniInt(strLogger, "sinksNum");
-            std::string name = GetIniString(strLogger, "outputMode");
+            std::string name = GetIniString(strLogger, "name");
 
             for (auto j = 0; j < nSinks; ++j)
             {
-                ::memset(szTemp, 0, 16);
-                _snprintf_s(szTemp, 16, 15, "sinks_%d_type", j);
-                std::string strSinkType = szTemp;
+                ::memset(szTemp, 0, 32);
+                _snprintf_s(szTemp, 32, 31, "sinks_%d_type", j);
+                auto SinkType = GetIniString(strLogger, szTemp);
 
-                ::memset(szTemp, 0, 16);
-                _snprintf_s(szTemp, 16, 15, "sinks_%d_level", j);
-                auto SinkLevel = StringToOutLevelEnum(std::string(szTemp));
+                ::memset(szTemp, 0, 32);
+                _snprintf_s(szTemp, 32, 31, "sinks_%d_level", j);
+                auto strSinkLevelValue = GetIniString(strLogger, szTemp);
+                std::transform(strSinkLevelValue.begin(), strSinkLevelValue.end(), strSinkLevelValue.begin(), ::toupper);
+                auto SinkLevel = StringToOutLevelEnum(strSinkLevelValue);
 
-                ::memset(szTemp, 0, 16);
-                _snprintf_s(szTemp, 16, 15, "sinks_%d_fileName", j);
-                auto SinkNameKey = std::string(szTemp);
-
-                if (strSinkType == "console")
+                if (SinkType == "console")
                 {
                     AddColorConsole(name.c_str(), SinkLevel);
                 }
-                else if (strSinkType == "r_file")
+                else if (SinkType == "r_file")
                 {
-                    std::string strSinkName = GetIniString(strLogger, SinkNameKey.c_str());
+                    ::memset(szTemp, 0, 32);
+                    _snprintf_s(szTemp, 32, 31, "sinks_%d_fileName", j);
+                    auto strNameValue = GetIniString(strLogger, szTemp);
 
-                    ::memset(szTemp, 0, 16);
-                    _snprintf_s(szTemp, 16, 15, "sinks_%d_maxFileSize", j);
+                    ::memset(szTemp, 0, 32);
+                    _snprintf_s(szTemp, 32, 31, "sinks_%d_maxFileSize", j);
                     int nMaxFileSize = GetIniInt(strLogger, szTemp);
 
-                    ::memset(szTemp, 0, 16);
-                    _snprintf_s(szTemp, 16, 15, "sinks_%d_maxSize", j);
+                    ::memset(szTemp, 0, 32);
+                    _snprintf_s(szTemp, 32, 31, "sinks_%d_maxSize", j);
                     int nMaxFile = GetIniInt(strLogger, szTemp);
 
-                    AddRotatingFile(strLogger.c_str(), strSinkName.c_str(), nMaxFileSize, nMaxFile, SinkLevel);
+                    AddRotatingFile(name.c_str(), strNameValue.c_str(), nMaxFileSize, nMaxFile, SinkLevel);
                 }
-                else if (strSinkType == "d_file")
+                else if (SinkType == "d_file")
                 {
-                    std::string strSinkName = GetIniString(strLogger, SinkNameKey.c_str());
-                    string strFileName = szTemp;
+                    ::memset(szTemp, 0, 32);
+                    _snprintf_s(szTemp, 32, 31, "sinks_%d_fileName", j);
+                    std::string strSinkNameValue = GetIniString(strLogger, szTemp);
 
-                    ::memset(szTemp, 0, 16);
-                    _snprintf_s(szTemp, 16, 15, "sinks_%d_hour", j);
+                    ::memset(szTemp, 0, 32);
+                    _snprintf_s(szTemp, 32, 31, "sinks_%d_hour", j);
                     int nHour = GetIniInt(strLogger, szTemp);
 
-                    ::memset(szTemp, 0, 16);
-                    _snprintf_s(szTemp, 16, 15, "sinks_%d_minute", j);
+                    ::memset(szTemp, 0, 32);
+                    _snprintf_s(szTemp, 32, 31, "sinks_%d_minute", j);
                     int nMinute = GetIniInt(strLogger, szTemp);
 
-                    AddDailyFile(strLogger.c_str(), strFileName.c_str(), nHour, nMinute, SinkLevel);
+                    AddDailyFile(name.c_str(), strSinkNameValue.c_str(), nHour, nMinute, SinkLevel);
                 }
             }
         }

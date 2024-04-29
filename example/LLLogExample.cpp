@@ -45,18 +45,25 @@ void DailyFileLogTest()
     LOG_LL_CRITI("logger-Daily", "CRITI log data:{}", "这是CRITI");
 }
 
+void IniConfigLogTest()
+{
+    LogLL log;
+    log.InitConfig_ini("test2.ini");
+}
+
 int main()
 {
 	//     //控制台（软件初始化）
 
 	cout << "log test begin " << endl;
-
+    /*
     ConsoleLogTest();
 
     RotatingFileLogTest();
 
     DailyFileLogTest();
-
+    */
+    IniConfigLogTest();
 	system("pause");
 
 	return 0;
